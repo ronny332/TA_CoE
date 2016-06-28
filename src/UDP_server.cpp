@@ -15,12 +15,15 @@
 #include <sys/socket.h>
 //#include <netdb.h>
 #include <arpa/inet.h> // inet_addr
+#include <stdio.h> // sprintf
 //#include <unistd.h> // close
 
 namespace nn {
-    el::Logger* udp_logger{nullptr};
+    el::Logger *udp_logger{nullptr};
 
     bool UDP_server::create_server(int port) {
+        el::Logger *l = el::Loggers::getLogger("udp_server");
+
         memset(&server, 0, sizeof(server));
         server.sin_family = AF_INET;
         server.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -80,11 +83,17 @@ namespace nn {
             }
 
             if (recv_len == 14) {
-//                std::cout << "Raw Data: ";
-//                for (int i = 0; i < 14; ++i) {
-//                    std::cout << std::hex << ((int)buf[i] & 0xFF) << " ";
-//                }
-//                std::cout << std::endl;
+                CVLOG(7, "udp_server") << "got new UDP input, 14 bytes";
+
+                if VLOG_IS_ON(9) {
+                    std::stringstream raw_data;
+                    raw_data << "raw data: ";
+                    for (int i = 0; i < 14; ++i) {
+                        raw_data << std::hex << ((int) buf[i] & 0xFF) << " ";
+                    }
+
+                    CVLOG(8, "udp_server") << raw_data.str();
+                }
 
                 // knot
                 knot = (int) buf[0];
@@ -110,31 +119,40 @@ namespace nn {
                     counter--;
                 }
 
-//                std::cout << "Parsed: " << knot << " " << index;
-
+                // write updated values
                 for (int i = 0; i < values_len; ++i) {
-//                    printf("\t%2.1f(%d)\t", ((double) values[i] / 10), (int)updated[i]);
-
-                    if ((int)updated[i]) {
+                    if ((int) updated[i]) {
                         data->set_field(knot, index, i, values[i]);
                     }
                 }
 
-                std::cout << "\nValues:\n";
+                if VLOG_IS_ON(9) {
+                    std::stringstream parsed;
+                    char buffer[50];
 
-                data->print_data();
+                    parsed << knot << " " << index;
 
-                std::cout << "\n";
+                    for (int i = 0; i < values_len; ++i) {
+                        memset(&buffer, 0, sizeof(buffer));
+                        sprintf(buffer, "%2.1f(%d)", ((double) values[i] / 10), (int) updated[i]);
+
+                        parsed << buffer << ", ";
+                    }
+
+                    CVLOG(9, "udp_server") << "parsed: " << parsed.str().substr(0, parsed.str().length() - 2);
+                }
+
+                CVLOG(9, "udp_server") << "values: " << data->print_data();
             }
             else {
-                CLOG(WARNING, "udp_server") << "invalid udp input, length " << recv_len;
+                CLOG(WARNING, "udp_server") << "invalid udp input, " << recv_len << " bytes";
             }
         }
     }
 
     void UDP_server::init() {
         if (udp_logger == nullptr) {
-            el::Logger* udp_server = el::Loggers::getLogger("udp_server");
+            el::Logger *udp_server = el::Loggers::getLogger("udp_server");
         }
     }
 }

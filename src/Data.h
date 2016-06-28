@@ -13,7 +13,7 @@ namespace nn {
     public:
         Data() : auto_correct(true) {};
 
-        void print_data();
+        std::string print_data();
         void set_field(int knot, int index, int position, int value);
 
     private:

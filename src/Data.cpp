@@ -2,16 +2,20 @@
 // Created by noname on 27.06.16.
 //
 
-#include <iostream>
 #include <mutex>
+#include <sstream>
 
 #include "Data.h"
+
+#include "strlib.h"
 
 namespace nn {
     std::mutex mtx;
 
-    void Data::print_data() {
+    std::string Data::print_data() {
         int value_number{0};
+        std::stringstream ss_out;
+        std::string out;
 
         for (int i = 0; i < data.size(); ++i) {
             for (int j = 0; j < data[i].size(); ++j) {
@@ -19,13 +23,15 @@ namespace nn {
                     // only show updated values
                     if (data[i][j][k][2] == 1) {
                         value_number++;
-                        std::cout << value_number << ":" << std::dec << data[i][j][k][0] << "\n";
+                        ss_out << value_number << ":" << std::dec << data[i][j][k][0] << ", ";
                     }
                 }
             }
         }
 
-        std::cout << "\n";
+        out = trim(ss_out.str());
+
+        return out.substr(0, out.length() - 1);
     }
 
     void Data::set_field(int knot, int index, int position, int value) {
