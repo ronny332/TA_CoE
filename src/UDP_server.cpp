@@ -3,7 +3,8 @@
 //
 
 #include "UDP_server.h"
-#include "Debug.h"
+
+#include "easylogging++.h"
 
 #include <array>
 #include <iomanip>
@@ -17,6 +18,8 @@
 //#include <unistd.h> // close
 
 namespace nn {
+    el::Logger* udp_logger{nullptr};
+
     bool UDP_server::create_server(int port) {
         memset(&server, 0, sizeof(server));
         server.sin_family = AF_INET;
@@ -25,9 +28,11 @@ namespace nn {
 
         // bind to port
         if (::bind(sock, (sockaddr *) &server, sizeof(server)) < 0) {
-            nn::die("Bind", errno);
+            CLOG(ERROR, "udp_server") << "unable to bind socket";
+            return false;
         }
 
+        CVLOG(7, "udp_server") << "socket bound";
         return true;
     }
 
@@ -35,9 +40,11 @@ namespace nn {
         sock = socket(AF_INET, SOCK_DGRAM, 0);
 
         if (sock < 0) {
-            nn::die("Socket", errno);
+            CLOG(ERROR, "udp_server") << "unable to create socket";
+            return false;
         }
 
+        CVLOG(7, "udp_server") << "socket created";
         return true;
     }
 
@@ -68,7 +75,8 @@ namespace nn {
             }
 
             if ((recv_len = recvfrom(sock, buf, buf_len, 0, (sockaddr *) &client, &client_len)) == -1) {
-                nn::die("Receive", errno);
+                CLOG(ERROR, "udp_server") << "got wrong UDP input, aborting";
+                return;
             }
 
             if (recv_len == 14) {
@@ -118,6 +126,15 @@ namespace nn {
 
                 std::cout << "\n";
             }
+            else {
+                CLOG(WARNING, "udp_server") << "invalid udp input, length " << recv_len;
+            }
+        }
+    }
+
+    void UDP_server::init() {
+        if (udp_logger == nullptr) {
+            el::Logger* udp_server = el::Loggers::getLogger("udp_server");
         }
     }
 }

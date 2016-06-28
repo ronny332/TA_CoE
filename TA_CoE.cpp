@@ -3,18 +3,41 @@
 #include <thread>
 
 #include "Data.h"
+#include <Telnet_server.h>
 #include "UDP_server.h"
 
-void start_connection(nn::UDP_server con);
+#include "easylogging++.h"
+INITIALIZE_EASYLOGGINGPP
 
-int main() {
+void start_telnet_server(nn::Telnet_server server);
+void start_udp_server(nn::UDP_server server);
+
+int main(int argc, char** argv) {
+    START_EASYLOGGINGPP(argc, argv);
+
+    el::Logger* main = el::Loggers::getLogger("main");
+    CVLOG(5, "main") << "started";
+
+    // data container
     nn::Data data;
-    nn::UDP_server con{5441, &data};
-    std::thread t_con(start_connection, con);
 
-    t_con.join();
+    // telnet server
+    nn::Telnet_server telnet_server{5441, &data};
+    std::thread t_telnet_server(start_telnet_server, telnet_server);
+
+    // udp server
+    nn::UDP_server udp_server{5441, &data};
+    std::thread t_udp_server(start_udp_server, udp_server);
+
+    // "join" threads (should never happen)
+    t_telnet_server.join();
+    t_udp_server.join();
 }
 
-void start_connection(nn::UDP_server con) {
-    con.start();
+void start_udp_server(nn::UDP_server server) {
+    server.start();
+}
+
+void start_telnet_server(nn::Telnet_server server) {
+    server.start();
 }

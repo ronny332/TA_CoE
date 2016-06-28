@@ -12,7 +12,10 @@
 namespace nn {
     class UDP_server {
     public:
-        UDP_server(int port, Data *data) : port(port), data(data) {
+        UDP_server() = delete;
+
+        UDP_server(int port, Data* data) : port(port), data(data) {
+            init();
             if (create_socket()) {
                 runable = create_server(port);
             }
@@ -31,6 +34,7 @@ namespace nn {
         bool create_socket();
         bool create_server(int port);
         void handle_data();
+        void init();
 
         Data* data;
         int port;

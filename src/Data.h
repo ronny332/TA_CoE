@@ -11,11 +11,13 @@
 namespace nn {
     class Data {
     public:
+        Data() : auto_correct(true) {};
+
         void print_data();
         void set_field(int knot, int index, int position, int value);
 
     private:
-        bool auto_correct = true;
+        bool auto_correct;
         std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::array<int, 3>>>> data;
     };
 }

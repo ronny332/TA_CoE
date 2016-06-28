@@ -12,6 +12,7 @@ set(SOURCE_FILES TA_CoE.cpp
 
 include_directories(src)
 
+include_directories(lib/easyloggingpp/src)
 include_directories(lib/stanford-cpp-library/StanfordCPPLib)
 add_subdirectory(lib)
 
