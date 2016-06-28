@@ -14,20 +14,27 @@ namespace nn {
     public:
         UDP_server(int port, Data *data) : port(port), data(data) {
             if (create_socket()) {
-                if (create_server(port)) {
-                    handle_data();
-                }
+                runable = create_server(port);
             }
         }
 
+        bool start() {
+            if (runable) {
+                handle_data();
+                return true;
+            }
+
+            return false;
+        }
+
+    private:
         bool create_socket();
         bool create_server(int port);
         void handle_data();
 
-
-    private:
         Data* data;
         int port;
+        bool runable;
         sockaddr_in server;
         int sock;
     };

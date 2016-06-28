@@ -3,10 +3,13 @@
 //
 
 #include <iostream>
+#include <mutex>
 
 #include "Data.h"
 
 namespace nn {
+    std::mutex mtx;
+
     void Data::print_data() {
         int value_number{0};
 
@@ -31,6 +34,8 @@ namespace nn {
         if (auto_correct && old_value != 0 && value == 0 && (old_value > 10 || old_value < 10)) {
             return;
         }
+
+        std::lock_guard<std::mutex> lock(mtx);
 
         // value
         data[knot][index][position][0] = value;

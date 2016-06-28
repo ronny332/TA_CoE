@@ -12,25 +12,9 @@
 #include <string.h>
 
 namespace nn {
-    enum LOG_TYPES {
-        LOG_ERR,
-        LOG_STD,
-    };
-
     void die(const char *text, int error_no) {
         std::cerr << text << ": " << errno << ", " << strerror(error_no) << std::endl;
         exit(error_no);
-    }
-
-    void log(LOG_TYPES type, const char *text) {
-        switch (type) {
-            case LOG_ERR:
-                std::cerr << text << "\n";
-                break;
-            case LOG_STD:
-                std::cout << text << "\n";
-                break;
-        }
     }
 }
 
