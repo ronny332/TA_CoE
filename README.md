@@ -3,7 +3,7 @@ CAN-Bus reader for "Technische Alternative" (TA) "CAN over Ethernet" (CoE)
 
 There are no external dependencies (besides the included libraries). A C++11 compiler is required to get the souce code built. It should work on many modern *nix plattforms.
 
-Currently the software is not fully usable. The data is read, but the telnet server understand only a `list` command.
+Currently the software is not fully usable. The data is read, but the telnet server understands only a `list` command.
 
 # Build
 * clone this repository: `git clone https://github.com/ronny332/TA_CoE`
