@@ -11,7 +11,7 @@ Currently the software is not fully usable. The data is read, but the telnet ser
 * move to working directory: `cd TA_CoE`
 * run cmake: `cmake .`
 * run the makefile: `make`
-* start TA_CoE: `./TA_CoE`
+* start TA_CoE: `./TA_CoE -v`
 
 # Options
 * -v turns on the verbose level to maximum
