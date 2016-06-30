@@ -7,9 +7,10 @@ For the use on older distributions like Raspbian the compiler flag "-std=c++0x" 
 Currently the software is not fully usable. The data is read, but the telnet server is not replying anything.
 
 # Build
-* clone this repository
+* clone this repository: `git clone https://github.com/ronny332/TA_CoE`
+* move to working directory: `cd TA_CoE`
 * run cmake: `cmake .`
-* run the makefile:`make`
+* run the makefile: `make`
 * start TA_CoE: `./TA_CoE`
 
 # Options
