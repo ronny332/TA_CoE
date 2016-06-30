@@ -63,12 +63,15 @@ namespace nn {
 
     void Telnet_server::handle_requests() {
         sockaddr_in client{};
-        std::string request_str{};
         char recv_buffer[recv_buffer_size];
         int recv_size{0};
         int send_size{0};
         int sock_client{0};
         socklen_t sock_len = sizeof(client);
+
+        std::string request_str{};
+        std::string response_str{};
+        std::string response_stream{};
 
         CVLOG(6, "telnet_server") << "waiting for new connections";
 
@@ -85,16 +88,26 @@ namespace nn {
                 CLOG(ERROR, "telnet_server") << "invalid request, received size: " << recv_size;
             }
 
+            CVLOG(7, "telnet_server") << "new connection from " << Utils::get_ip(client);
+
             request_str = trim(recv_buffer);
+            response_str = "";
+            response_stream.c_str();
 
             if (commands[request_str]) {
-                if ((send_size = send(sock_client, request_str.c_str(), request_str.length(), 0)) < 0) {
-                    CLOG(ERROR, "telnet_server") << "unable to send response to client ";
+                if (request_str == "list") {
+                    response_str = data->print_data();
                 }
             }
+            else {
+                response_str = "invalid request";
+            }
 
-            LOG(INFO) << Utils::get_ip(client);
+            if ((send_size = send(sock_client, response_str.c_str(), response_str.length(), 0)) < 0) {
+                CLOG(ERROR, "telnet_server") << "unable to send response to client ";
+            }
 
+            shutdown(sock_client, SHUT_WR);
             close(sock_client);
         }
     }
