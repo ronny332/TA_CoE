@@ -1,7 +1,7 @@
 # TA_CoE
 CAN-Bus reader for "Technische Alternative" (TA) "CAN over Ethernet" (CoE)
 
-There are no external dependecies. The Source Code should build on every modern *nix plattform.
+There are no external dependencies (besides the included libraries). The Source Code should build on every modern *nix plattform.
 For the use on older distributions like Raspbian the compiler flag "-std=c++0x" is used instead of "-std=c++11".
 
 Currently the software is not fully usable. The data is read, but the telnet server is not replying anything.
