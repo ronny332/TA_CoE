@@ -2,19 +2,17 @@
 // Created by noname on 27.06.16.
 //
 
-#ifndef UDP_TEST_SOCKET_H
-#define UDP_TEST_SOCKET_H
+#ifndef COE_SERVER_H
+#define COE_SERVER_H
 
 #include "Data.h"
 
-#include <netinet/in.h>
-
 namespace nn {
-    class UDP_server {
+    class CoE_server {
     public:
-        UDP_server() = delete;
+        CoE_server() = delete;
 
-        UDP_server(int port, Data* data) : port(port), data(data) {
+        CoE_server(int port, Data* data) : port(port), data(data) {
             init();
             if (create_socket()) {
                 runable = create_server(port);
@@ -44,4 +42,4 @@ namespace nn {
     };
 }
 
-#endif //UDP_TEST_SOCKET_H
+#endif //COE_SERVER_SOCKET_H

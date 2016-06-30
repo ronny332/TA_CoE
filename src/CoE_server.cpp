@@ -2,56 +2,55 @@
 // Created by noname on 27.06.16.
 //
 
-#include "UDP_server.h"
-
-#include "easylogging++.h"
-
 #include <array>
 #include <iomanip>
 #include <sstream>
 
 #include <errno.h>
+#include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 //#include <netdb.h>
 #include <arpa/inet.h> // inet_addr
 #include <stdio.h> // sprintf
-//#include <unistd.h> // close
+
+#include "CoE_server.h"
+
+#include "easylogging++.h"
 
 namespace nn {
-    el::Logger *udp_logger{nullptr};
+    el::Logger *coe_logger{nullptr};
 
-    bool UDP_server::create_server(int port) {
-        el::Logger *l = el::Loggers::getLogger("udp_server");
-
+    bool CoE_server::create_server(int port) {
         memset(&server, 0, sizeof(server));
         server.sin_family = AF_INET;
         server.sin_addr.s_addr = htonl(INADDR_ANY);
         server.sin_port = htons(port);
 
         // bind to port
-        if (::bind(sock, (sockaddr *) &server, sizeof(server)) < 0) {
-            CLOG(ERROR, "udp_server") << "unable to bind socket";
+        int res{0};
+        if ((res = ::bind(sock, (sockaddr *) &server, sizeof(server))) < 0) {
+            CLOG(ERROR, "coe_server") << "unable to bind socket: #" << res << ", port:" << port;
             return false;
         }
 
-        CVLOG(7, "udp_server") << "socket bound";
+        CVLOG(6, "coe_server") << "socket bound to port " << port << "/udp";
         return true;
     }
 
-    bool UDP_server::create_socket() {
+    bool CoE_server::create_socket() {
         sock = socket(AF_INET, SOCK_DGRAM, 0);
 
         if (sock < 0) {
-            CLOG(ERROR, "udp_server") << "unable to create socket";
+            CLOG(ERROR, "coe_server") << "unable to create socket";
             return false;
         }
 
-        CVLOG(7, "udp_server") << "socket created";
+        CVLOG(6, "coe_server") << "socket created";
         return true;
     }
 
-    void UDP_server::handle_data() {
+    void CoE_server::handle_data() {
         unsigned short int buf_len = 15;
         char buf[buf_len];
         int recv_len;
@@ -78,12 +77,12 @@ namespace nn {
             }
 
             if ((recv_len = recvfrom(sock, buf, buf_len, 0, (sockaddr *) &client, &client_len)) == -1) {
-                CLOG(ERROR, "udp_server") << "got wrong UDP input, aborting";
+                CLOG(ERROR, "coe_server") << "got wrong UDP input, aborting";
                 return;
             }
 
             if (recv_len == 14) {
-                CVLOG(7, "udp_server") << "got new UDP input, 14 bytes";
+                CVLOG(7, "coe_server") << "got new UDP input, 14 bytes";
 
                 if VLOG_IS_ON(9) {
                     std::stringstream raw_data;
@@ -92,7 +91,7 @@ namespace nn {
                         raw_data << std::hex << ((int) buf[i] & 0xFF) << " ";
                     }
 
-                    CVLOG(8, "udp_server") << raw_data.str();
+                    CVLOG(9, "coe_server") << raw_data.str();
                 }
 
                 // knot
@@ -136,23 +135,23 @@ namespace nn {
                         memset(&buffer, 0, sizeof(buffer));
                         sprintf(buffer, "%2.1f(%d)", ((double) values[i] / 10), (int) updated[i]);
 
-                        parsed << buffer << ", ";
+                        parsed << " " << buffer << ", ";
                     }
 
-                    CVLOG(9, "udp_server") << "parsed: " << parsed.str().substr(0, parsed.str().length() - 2);
+                    CVLOG(8, "coe_server") << "parsed: " << parsed.str().substr(0, parsed.str().length() - 2);
                 }
 
-                CVLOG(9, "udp_server") << "values: " << data->print_data();
+                CVLOG(9, "coe_server") << "values: " << data->print_data();
             }
             else {
-                CLOG(WARNING, "udp_server") << "invalid udp input, " << recv_len << " bytes";
+                CLOG(WARNING, "coe_server") << "invalid udp input, " << recv_len << " bytes";
             }
         }
     }
 
-    void UDP_server::init() {
-        if (udp_logger == nullptr) {
-            el::Logger *udp_server = el::Loggers::getLogger("udp_server");
+    void CoE_server::init() {
+        if (coe_logger == nullptr) {
+            el::Logger *coe_server = el::Loggers::getLogger("coe_server");
         }
     }
 }

@@ -5,10 +5,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
 set(SOURCE_FILES TA_CoE.cpp
         src/Data.cpp src/Data.h
-        src/Debug.h
         src/Telnet_server.cpp src/Telnet_server.h
-        src/UDP_server.cpp src/UDP_server.h
-        )
+        src/CoE_server.cpp src/CoE_server.h
+        src/Utils.cpp src/Utils.h)
 
 include_directories(src)
 
