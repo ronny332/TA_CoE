@@ -21,3 +21,5 @@ Currently the software is not fully usable. The data is read, but the telnet ser
 * `list` return all known values
 
 connect to port 5441 (TCP) to run the command, for instance `echo list | nc localhost 5441`
+
+![TA_CoE in an early version](https://github.com/ronny332/TA_CoE/raw/master/TA_CoE.png)
