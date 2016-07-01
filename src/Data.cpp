@@ -15,10 +15,10 @@ namespace nn {
     nlohmann::json Data::as_json() {
         nlohmann::json json;
 
-        for (auto knot :data) {
-            for (auto index : knot.second) {
-                for (auto position : index.second) {
-                    json[std::to_string(knot.first)][index.first][position.first] = position.second.value;
+        for (auto &knot :data) {
+            for (auto &index : knot.second) {
+                for (auto &data_object : index.second) {
+                    json[std::to_string(knot.first)][index.first].push_back(data_object.value);
                 }
             }
         }
@@ -34,10 +34,9 @@ namespace nn {
 
         for (auto knot :data) {
             for (auto index : knot.second) {
-                for (auto position : index.second) {
+                for (auto data_object : index.second) {
                     value_number++;
-                    ss_out << value_number << ":" << std::dec << position.second.value << ", ";
-//                    }
+                    ss_out << value_number << ":" << std::dec << data_object.value << ", ";
                 }
             }
         }

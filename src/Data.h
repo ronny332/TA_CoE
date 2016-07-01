@@ -28,7 +28,7 @@ namespace nn {
 
     private:
         bool auto_correct;
-        std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, Data_Object>>> data;
+        std::unordered_map<int, std::unordered_map<int, std::array<Data_Object, 4>>> data;
     };
 }
 
