@@ -31,6 +31,8 @@ namespace nn {
             return false;
         }
 
+        std::vector<std::string> parse_command(const std::string& command);
+
     private:
         bool create_socket();
         bool create_server(int port);

@@ -12,43 +12,59 @@
 namespace nn {
     std::mutex mtx;
 
-    std::string Data::print_data() {
+    nlohmann::json Data::as_json() {
+        nlohmann::json json;
+
+        for (auto knot :data) {
+            for (auto index : knot.second) {
+                for (auto position : index.second) {
+                    json[std::to_string(knot.first)][index.first][position.first] = position.second.value;
+                }
+            }
+        }
+        return json;
+    }
+
+    std::string Data::as_string() {
         int value_number{0};
         std::stringstream ss_out;
         std::string out;
 
-        for (int i = 0; i < data.size(); ++i) {
-            for (int j = 0; j < data[i].size(); ++j) {
-                for (int k = 0; k < data[i][j].size(); ++k) {
-                    // only show updated values
-                    if (data[i][j][k][2] == 1) {
-                        value_number++;
-                        ss_out << value_number << ":" << std::dec << data[i][j][k][0] << ", ";
-                    }
+        nlohmann::json json;
+
+        for (auto knot :data) {
+            for (auto index : knot.second) {
+                for (auto position : index.second) {
+                    value_number++;
+                    ss_out << value_number << ":" << std::dec << position.second.value << ", ";
+//                    }
                 }
             }
         }
+
 
         out = trim(ss_out.str());
 
         return out.substr(0, out.length() - 1);
     }
 
-    void Data::set_field(int knot, int index, int position, int value) {
-        int old_value = data[knot][index][position][1];
+    void Data::set_field(int knot, int index, int position, int value, unsigned short int type) {
+        if (type > 0) {
+            int old_value = data[knot][index][position].value;
 
-        if (auto_correct && old_value != 0 && value == 0 && (old_value > 10 || old_value < 10)) {
-            return;
+            if (auto_correct && old_value != 0 && value == 0 && (old_value > 10 || old_value < 10)) {
+                return;
+            }
         }
 
         std::lock_guard<std::mutex> lock(mtx);
 
         // value
-        data[knot][index][position][0] = value;
+        data[knot][index][position].value = value;
+        // type
+        data[knot][index][position].type = type;
         // time
-        data[knot][index][position][1] = time(NULL);
-        // updated
-        data[knot][index][position][2] = 1;
+        data[knot][index][position].time = time(NULL);
     }
 }
 

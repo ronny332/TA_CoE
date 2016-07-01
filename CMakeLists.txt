@@ -8,7 +8,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     endif()
 endif ()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
 
 set(SOURCE_FILES TA_CoE.cpp
         src/Data.cpp src/Data.h
@@ -19,6 +19,7 @@ set(SOURCE_FILES TA_CoE.cpp
 include_directories(src)
 
 include_directories(lib/easyloggingpp/src)
+include_directories(lib/json/src)
 include_directories(lib/stanford-cpp-library/StanfordCPPLib)
 add_subdirectory(lib)
 

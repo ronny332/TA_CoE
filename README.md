@@ -18,7 +18,8 @@ Currently the software is not fully usable. The data is read, but the telnet ser
 * --v[0-9] will change the verbose level 
 
 # Telnet Commands
-* `list` return all known values
+* `get ALL` return all known values as text
+* `get ALL as JSON` return all known values as JSON data 
 
 connect to port 5441 (TCP) to run the command, for instance `echo list | nc localhost 5441`
 

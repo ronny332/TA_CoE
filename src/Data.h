@@ -8,17 +8,27 @@
 #include <array>
 #include <unordered_map>
 
+#include "json.hpp"
+
 namespace nn {
+    struct Data_Object {
+        int value;
+        unsigned short int type;
+        time_t time;
+    };
+
     class Data {
     public:
         Data() : auto_correct(true) {};
 
-        std::string print_data();
-        void set_field(int knot, int index, int position, int value);
+        nlohmann::json as_json();
+        std::string as_string();
+
+        void set_field(int knot, int index, int position, int value, unsigned short int type);
 
     private:
         bool auto_correct;
-        std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::array<int, 3>>>> data;
+        std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, Data_Object>>> data;
     };
 }
 

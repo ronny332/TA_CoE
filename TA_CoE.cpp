@@ -15,7 +15,7 @@ void start_udp_server(nn::CoE_server server);
 int main(int argc, char** argv) {
     START_EASYLOGGINGPP(argc, argv);
 
-    el::Logger* main = el::Loggers::getLogger("main");
+    el::Loggers::getLogger("main");
     CVLOG(5, "main") << "started";
 
     // data container

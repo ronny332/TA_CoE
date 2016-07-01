@@ -12,7 +12,7 @@ namespace nn {
     public:
         CoE_server() = delete;
 
-        CoE_server(int port, Data* data) : port(port), data(data) {
+        CoE_server(int port, Data* data) : data(data), port(port) {
             init();
             if (create_socket()) {
                 runable = create_server(port);

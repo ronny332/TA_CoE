@@ -10,6 +10,7 @@
 #include "Utils.h"
 
 #include "easylogging++.h"
+#include "json.hpp"
 #include "strlib.h"
 
 
@@ -94,9 +95,16 @@ namespace nn {
             response_str = "";
             response_stream.c_str();
 
-            if (commands[request_str]) {
-                if (request_str == "list") {
-                    response_str = data->print_data();
+            auto commands = parse_command(request_str);
+
+            if (commands.size() > 0 && commands[0] == "get") {
+                if (commands.size() > 1 && commands[1] == "ALL") {
+                    if (commands.size() > 3 && commands[2] == "as" && commands[3] == "JSON") {
+                        response_str = data->as_json().dump();
+                    }
+                    else {
+                        response_str = data->as_string();
+                    }
                 }
             }
             else {
@@ -113,11 +121,15 @@ namespace nn {
     }
 
     void Telnet_server::init() {
-        commands["list"] = 1;
-
         if (telnet_logger == nullptr) {
-            el::Logger *udp_server = el::Loggers::getLogger("telnet_server");
+            telnet_logger = el::Loggers::getLogger("telnet_server");
         }
+    }
+
+    std::vector<std::string> Telnet_server::parse_command(const std::string &command) {
+        auto parts = stringSplit(trim(command), " ");
+
+        return parts;
     }
 }
 

@@ -59,20 +59,23 @@ namespace nn {
         socklen_t client_len = sizeof(client);
 
         uint8_t counter;
+        bool digital_values{true};
         unsigned short int index;
         unsigned short int knot;
         std::stringstream knot_tmp;
         const uint8_t values_len{4};
+        std::array<int, values_len> value_types;
         std::array<int, values_len> values;
-        std::array<bool, values_len> updated;
 
         for (; ;) {
             memset(&buf, 0, buf_len);
+            digital_values = true;
             knot = 0;
             knot_tmp.str("");
             index = 0;
 
             for (int i = 0; i < 4; ++i) {
+                value_types[i] = 0;
                 values[i] = 0;
             }
 
@@ -111,17 +114,27 @@ namespace nn {
                     }
                 }
 
-                // updated
+                // detect value types (digital values always have a type of 0 for all 4 fields)
                 counter = values_len - 1;
                 for (int i = 13; i > 9; --i) {
-                    updated[counter] = (int) buf[i] & 0b1;
+                    if (((int) buf[i] & 0x1F) > 0) {
+                        if (digital_values) {
+                            digital_values = false;
+                        }
+
+                        value_types[counter] = (int) buf[i] & 0x1F;
+                    }
+
                     counter--;
                 }
 
                 // write updated values
-                for (int i = 0; i < values_len; ++i) {
-                    if ((int) updated[i]) {
-                        data->set_field(knot, index, i, values[i]);
+                for (int i = values_len - 1; i >= 0; --i) {
+                    if (digital_values) {
+                        data->set_field(knot, index, i, values[i], 0);
+                    }
+                    else if (value_types[i] > 0) {
+                        data->set_field(knot, index, i, values[i], value_types[i]);
                     }
                 }
 
@@ -133,7 +146,7 @@ namespace nn {
 
                     for (int i = 0; i < values_len; ++i) {
                         memset(&buffer, 0, sizeof(buffer));
-                        sprintf(buffer, "%2.1f(%d)", ((double) values[i] / 10), (int) updated[i]);
+                        sprintf(buffer, "%2.1f(%d)", ((double) values[i] / 10), (int) value_types[i]);
 
                         parsed << " " << buffer << ", ";
                     }
@@ -141,7 +154,7 @@ namespace nn {
                     CVLOG(8, "coe_server") << "parsed: " << parsed.str().substr(0, parsed.str().length() - 2);
                 }
 
-                CVLOG(9, "coe_server") << "values: " << data->print_data();
+                CVLOG(9, "coe_server") << "values: " << data->as_string();
             }
             else {
                 CLOG(WARNING, "coe_server") << "invalid udp input, " << recv_len << " bytes";
@@ -151,7 +164,7 @@ namespace nn {
 
     void CoE_server::init() {
         if (coe_logger == nullptr) {
-            el::Logger *coe_server = el::Loggers::getLogger("coe_server");
+            coe_logger = el::Loggers::getLogger("coe_server");
         }
     }
 }
